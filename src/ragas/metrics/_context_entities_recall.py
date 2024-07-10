@@ -30,79 +30,144 @@ _output_parser = RagasoutputParser(pydantic_object=ContextEntitiesResponse)
 
 TEXT_ENTITY_EXTRACTION = Prompt(
     name="text_entity_extraction",
-    instruction="""Given a text, extract unique entities without repetition. Ensure you consider different forms or mentions of the same entity as a single entity.""",
+    # instruction="""Given a text, extract unique entities without repetition. Ensure you consider different forms or mentions of the same entity as a single entity.""",
+    instruction="""给定一段文本，提取其中的唯一实体而不重复。确保你将同一实体的不同形式或提及视为单个实体。""",
     input_keys=["text"],
     output_key="output",
     output_type="json",
     output_format_instruction=_output_instructions,
+    # examples=[
+    #     {
+    #         "text": """The Eiffel Tower, located in Paris, France, is one of the most iconic landmarks globally.
+    #         Millions of visitors are attracted to it each year for its breathtaking views of the city.
+    #         Completed in 1889, it was constructed in time for the 1889 World's Fair.""",
+    #         "output": ContextEntitiesResponse.parse_obj(
+    #             {
+    #                 "entities": [
+    #                     "Eiffel Tower",
+    #                     "Paris",
+    #                     "France",
+    #                     "1889",
+    #                     "World's Fair",
+    #                 ],
+    #             }
+    #         ).dict(),
+    #     },
+    #     {
+    #         "text": """The Colosseum in Rome, also known as the Flavian Amphitheatre, stands as a monument to Roman architectural and engineering achievement.
+    #         Construction began under Emperor Vespasian in AD 70 and was completed by his son Titus in AD 80.
+    #         It could hold between 50,000 and 80,000 spectators who watched gladiatorial contests and public spectacles.""",
+    #         "output": ContextEntitiesResponse.parse_obj(
+    #             {
+    #                 "entities": [
+    #                     "Colosseum",
+    #                     "Rome",
+    #                     "Flavian Amphitheatre",
+    #                     "Vespasian",
+    #                     "AD 70",
+    #                     "Titus",
+    #                     "AD 80",
+    #                 ],
+    #             }
+    #         ).dict(),
+    #     },
+    #     {
+    #         "text": """The Great Wall of China, stretching over 21,196 kilometers from east to west, is a marvel of ancient defensive architecture.
+    #         Built to protect against invasions from the north, its construction started as early as the 7th century BC.
+    #         Today, it is a UNESCO World Heritage Site and a major tourist attraction.""",
+    #         "output": ContextEntitiesResponse.parse_obj(
+    #             {
+    #                 "entities": [
+    #                     "Great Wall of China",
+    #                     "21,196 kilometers",
+    #                     "7th century BC",
+    #                     "UNESCO World Heritage Site",
+    #                 ],
+    #             }
+    #         ).dict(),
+    #     },
+    #     {
+    #         "text": """The Apollo 11 mission, which launched on July 16, 1969, marked the first time humans landed on the Moon.
+    #         Astronauts Neil Armstrong, Buzz Aldrin, and Michael Collins made history, with Armstrong being the first man to step on the lunar surface.
+    #         This event was a significant milestone in space exploration.""",
+    #         "output": ContextEntitiesResponse.parse_obj(
+    #             {
+    #                 "entities": [
+    #                     "Apollo 11 mission",
+    #                     "July 16, 1969",
+    #                     "Moon",
+    #                     "Neil Armstrong",
+    #                     "Buzz Aldrin",
+    #                     "Michael Collins",
+    #                 ],
+    #             }
+    #         ).dict(),
+    #     },
+    # ],
     examples=[
         {
-            "text": """The Eiffel Tower, located in Paris, France, is one of the most iconic landmarks globally.
-            Millions of visitors are attracted to it each year for its breathtaking views of the city.
-            Completed in 1889, it was constructed in time for the 1889 World's Fair.""",
+            "text": """埃菲尔铁塔位于法国巴黎，是全球最著名的地标之一。
+            每年有数以百万计的游客被其城市的壮丽景色所吸引。
+            埃菲尔铁塔于1889年完工，恰逢1889年世界博览会之际建成。""",
             "output": ContextEntitiesResponse.parse_obj(
                 {
-                    "entities": [
-                        "Eiffel Tower",
-                        "Paris",
-                        "France",
-                        "1889",
-                        "World's Fair",
-                    ],
-                }
-            ).dict(),
+                "entities": [
+                    "埃菲尔铁塔",
+                    "巴黎",
+                    "法国",
+                    "1889",
+                    "世界博览会",
+                ],
+            }).dict(),
         },
         {
-            "text": """The Colosseum in Rome, also known as the Flavian Amphitheatre, stands as a monument to Roman architectural and engineering achievement.
-            Construction began under Emperor Vespasian in AD 70 and was completed by his son Titus in AD 80.
-            It could hold between 50,000 and 80,000 spectators who watched gladiatorial contests and public spectacles.""",
+            "text": """罗马斗兽场，又称为弗拉维圆形剧场，是罗马建筑与工程成就的纪念碑。
+            在公元70年由韦帕芗皇帝开始建造，后由其子提图斯于公元80年完成。
+            它可以容纳5万至8万名观众观看角斗士比赛和公众表演。""",
             "output": ContextEntitiesResponse.parse_obj(
-                {
-                    "entities": [
-                        "Colosseum",
-                        "Rome",
-                        "Flavian Amphitheatre",
-                        "Vespasian",
-                        "AD 70",
-                        "Titus",
-                        "AD 80",
-                    ],
-                }
-            ).dict(),
+            {
+                "entities": [
+                    "罗马斗兽场",
+                    "罗马",
+                    "弗拉维圆形剧场",
+                    "韦帕芗",
+                    "公元70年",
+                    "提图斯",
+                    "公元80年",
+                ],
+            }).dict(),
         },
         {
-            "text": """The Great Wall of China, stretching over 21,196 kilometers from east to west, is a marvel of ancient defensive architecture.
-            Built to protect against invasions from the north, its construction started as early as the 7th century BC.
-            Today, it is a UNESCO World Heritage Site and a major tourist attraction.""",
+            "text": """中国的长城，从东到西绵延超过21,196公里，是古代防御建筑的奇迹。
+            为了抵御北方的入侵，其建设最早可追溯至公元前7世纪。
+            如今，它是一个联合国教科文组织的世界遗产地，也是一个主要的旅游景点。""",
             "output": ContextEntitiesResponse.parse_obj(
                 {
-                    "entities": [
-                        "Great Wall of China",
-                        "21,196 kilometers",
-                        "7th century BC",
-                        "UNESCO World Heritage Site",
-                    ],
-                }
-            ).dict(),
+                "entities": [
+                    "中国的长城",
+                    "21,196公里",
+                    "公元前7世纪",
+                    "联合国教科文组织的世界遗产地",
+                ],
+            }).dict(),
         },
         {
-            "text": """The Apollo 11 mission, which launched on July 16, 1969, marked the first time humans landed on the Moon.
-            Astronauts Neil Armstrong, Buzz Aldrin, and Michael Collins made history, with Armstrong being the first man to step on the lunar surface.
-            This event was a significant milestone in space exploration.""",
+            "text": """阿波罗11号任务于1969年7月16日发射，标志着人类首次登月。
+            宇航员尼尔·阿姆斯特朗、巴兹·奥尔德林和迈克尔·柯林斯创造了历史，阿姆斯特朗成为第一个踏上月球表面的人。
+            这一事件是太空探索中的一个重要里程碑。""",
             "output": ContextEntitiesResponse.parse_obj(
                 {
-                    "entities": [
-                        "Apollo 11 mission",
-                        "July 16, 1969",
-                        "Moon",
-                        "Neil Armstrong",
-                        "Buzz Aldrin",
-                        "Michael Collins",
-                    ],
-                }
-            ).dict(),
+                "entities": [
+                    "阿波罗11号任务",
+                    "1969年7月16日",
+                    "月球",
+                    "尼尔·阿姆斯特朗",
+                    "巴兹·奥尔德林",
+                    "迈克尔·柯林斯",
+                ],
+            }).dict(),
         },
-    ],
+    ]
 )
 
 

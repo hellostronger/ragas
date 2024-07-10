@@ -1,0 +1,12 @@
+numpy
+datasets
+tiktoken
+langchain
+langchain-core
+langchain-community
+langchain_openai
+openai>1
+pysbd>=0.3.4
+nest-asyncio
+appdirs
+sentence-transformers  # 这是可选依赖'all'的一部分，可以根据需要添加

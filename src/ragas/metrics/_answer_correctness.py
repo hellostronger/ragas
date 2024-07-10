@@ -39,100 +39,191 @@ class AnswerCorrectnessClassification(BaseModel):
 _output_instructions = get_json_format_instructions(AnswerCorrectnessClassification)
 _output_parser = RagasoutputParser(pydantic_object=AnswerCorrectnessClassification)
 
+# CORRECTNESS_INSTRUCTIONS = """\
+# Given a ground truth and an answer statements, analyze each statement and classify them in one of the following categories:
+#
+# - TP (true positive): statements that are present in answer that are also directly supported by the one or more statements in ground truth,
+# - FP (false positive): statements present in the answer but not directly supported by any statement in ground truth,
+# - FN (false negative): statements found in the ground truth but not present in answer.
+#
+# Each statement can only belong to one of the categories. Provide a reason for each classification.
+# """
 CORRECTNESS_INSTRUCTIONS = """\
-Given a ground truth and an answer statements, analyze each statement and classify them in one of the following categories:
+给定一个事实真相（ground truth）和一个回答陈述（answer statements），分析每个陈述并将其分类到以下类别之一：
 
-- TP (true positive): statements that are present in answer that are also directly supported by the one or more statements in ground truth,
-- FP (false positive): statements present in the answer but not directly supported by any statement in ground truth,
-- FN (false negative): statements found in the ground truth but not present in answer.
-
-Each statement can only belong to one of the categories. Provide a reason for each classification.
+- TP（真实阳性）：在回答中出现的陈述，这些陈述也直接被一个或多个事实真相中的陈述所支持，
+- FP（虚假阳性）：出现在回答中的陈述，但没有被事实真相中的任何陈述直接支持，
+- FN（虚假阴性）：在事实真相中找到的陈述，但在回答中并未出现。
+每个陈述只能属于上述类别的其中一个。为每个分类提供理由。
 """
+
 CORRECTNESS_PROMPT = Prompt(
     name="answer_correctness",
     instruction=CORRECTNESS_INSTRUCTIONS,
     output_format_instruction=_output_instructions,
+    # examples=[
+    #     {
+    #         "question": """What powers the sun and what is its primary function?""",
+    #         "answer": [
+    #             "The sun is powered by nuclear fission, similar to nuclear reactors on Earth.",
+    #             "The primary function of the sun is to provide light to the solar system.",
+    #         ],
+    #         "ground_truth": [
+    #             "The sun is powered by nuclear fusion, where hydrogen atoms fuse to form helium.",
+    #             "This fusion process in the sun's core releases a tremendous amount of energy.",
+    #             "The energy from the sun provides heat and light, which are essential for life on Earth.",
+    #             "The sun's light plays a critical role in Earth's climate system.",
+    #             "Sunlight helps to drive the weather and ocean currents.",
+    #         ],
+    #         "classification": AnswerCorrectnessClassification.parse_obj(
+    #             {
+    #                 "TP": [
+    #                     {
+    #                         "statement": "The primary function of the sun is to provide light to the solar system.",
+    #                         "reason": "This statement is somewhat supported by the ground truth mentioning the sun providing light and its roles, though it focuses more broadly on the sun's energy.",
+    #                     }
+    #                 ],
+    #                 "FP": [
+    #                     {
+    #                         "statement": "The sun is powered by nuclear fission, similar to nuclear reactors on Earth.",
+    #                         "reason": "This statement is incorrect and contradicts the ground truth which states that the sun is powered by nuclear fusion.",
+    #                     }
+    #                 ],
+    #                 "FN": [
+    #                     {
+    #                         "statement": "The sun is powered by nuclear fusion, where hydrogen atoms fuse to form helium.",
+    #                         "reason": "This accurate description of the sun’s power source is not included in the answer.",
+    #                     },
+    #                     {
+    #                         "statement": "This fusion process in the sun's core releases a tremendous amount of energy.",
+    #                         "reason": "This process and its significance are not mentioned in the answer.",
+    #                     },
+    #                     {
+    #                         "statement": "The energy from the sun provides heat and light, which are essential for life on Earth.",
+    #                         "reason": "The answer only mentions light, omitting the essential aspects of heat and its necessity for life, which the ground truth covers.",
+    #                     },
+    #                     {
+    #                         "statement": "The sun's light plays a critical role in Earth's climate system.",
+    #                         "reason": "This broader impact of the sun’s light on Earth's climate system is not addressed in the answer.",
+    #                     },
+    #                     {
+    #                         "statement": "Sunlight helps to drive the weather and ocean currents.",
+    #                         "reason": "The effect of sunlight on weather patterns and ocean currents is omitted in the answer.",
+    #                     },
+    #                 ],
+    #             }
+    #         ).dict(),
+    #     },
+    #     {
+    #         "question": """What is the boiling point of water?""",
+    #         "answer": [
+    #             "The boiling point of water is 100 degrees Celsius at sea level"
+    #         ],
+    #         "ground_truth": [
+    #             "The boiling point of water is 100 degrees Celsius (212 degrees Fahrenheit) at sea level.",
+    #             "The boiling point of water can change with altitude.",
+    #         ],
+    #         "classification": AnswerCorrectnessClassification.parse_obj(
+    #             {
+    #                 "TP": [
+    #                     {
+    #                         "statement": "The boiling point of water is 100 degrees Celsius at sea level",
+    #                         "reason": "This statement is directly supported by the ground truth which specifies the boiling point of water as 100 degrees Celsius at sea level.",
+    #                     }
+    #                 ],
+    #                 "FP": [],
+    #                 "FN": [
+    #                     {
+    #                         "statement": "The boiling point of water can change with altitude.",
+    #                         "reason": "This additional information about how the boiling point of water can vary with altitude is not mentioned in the answer.",
+    #                     }
+    #                 ],
+    #             }
+    #         ).dict(),
+    #     },
+    # ],
     examples=[
         {
-            "question": """What powers the sun and what is its primary function?""",
+            "question": """什么驱动着太阳的能量产生？太阳的主要功能是什么？""",
             "answer": [
-                "The sun is powered by nuclear fission, similar to nuclear reactors on Earth.",
-                "The primary function of the sun is to provide light to the solar system.",
+                "太阳是由核裂变驱动的，类似于地球上的核反应堆。",
+                "太阳的主要功能是为太阳系提供光亮。",
             ],
             "ground_truth": [
-                "The sun is powered by nuclear fusion, where hydrogen atoms fuse to form helium.",
-                "This fusion process in the sun's core releases a tremendous amount of energy.",
-                "The energy from the sun provides heat and light, which are essential for life on Earth.",
-                "The sun's light plays a critical role in Earth's climate system.",
-                "Sunlight helps to drive the weather and ocean currents.",
+                "太阳的能量来自核聚变，氢原子聚变形成氦。",
+                "太阳核心的聚变过程释放出巨大的能量。",
+                "太阳能提供热量和光，这对地球上的生命至关重要。",
+                "太阳光在地球气候系统中起着至关重要的作用。",
+                "阳光有助于推动天气和洋流。",
             ],
             "classification": AnswerCorrectnessClassification.parse_obj(
                 {
                     "TP": [
                         {
-                            "statement": "The primary function of the sun is to provide light to the solar system.",
-                            "reason": "This statement is somewhat supported by the ground truth mentioning the sun providing light and its roles, though it focuses more broadly on the sun's energy.",
+                            "statement": "太阳的主要功能是为太阳系提供光。",
+                            "reason": "这一说法在一定程度上得到了提到太阳提供光及其作用的基本事实的支持，尽管它更广泛地关注太阳能量。",
                         }
                     ],
                     "FP": [
                         {
-                            "statement": "The sun is powered by nuclear fission, similar to nuclear reactors on Earth.",
-                            "reason": "This statement is incorrect and contradicts the ground truth which states that the sun is powered by nuclear fusion.",
+                            "statement": "太阳由核裂变提供动力，类似于地球上的核反应堆。",
+                            "reason": "这个说法是错误的，与太阳由核聚变提供动力的基本事实相矛盾。",
                         }
                     ],
                     "FN": [
                         {
-                            "statement": "The sun is powered by nuclear fusion, where hydrogen atoms fuse to form helium.",
-                            "reason": "This accurate description of the sun’s power source is not included in the answer.",
+                            "statement": "太阳由核聚变提供动力，氢原子聚变形成氦。",
+                            "reason": "答案中没有包括对太阳动力源的准确描述。",
                         },
                         {
-                            "statement": "This fusion process in the sun's core releases a tremendous amount of energy.",
-                            "reason": "This process and its significance are not mentioned in the answer.",
+                            "statement": "太阳核心的聚变过程释放出巨大的能量。",
+                            "reason": "答案中没有提到这个过程及其重要性。",
                         },
                         {
-                            "statement": "The energy from the sun provides heat and light, which are essential for life on Earth.",
-                            "reason": "The answer only mentions light, omitting the essential aspects of heat and its necessity for life, which the ground truth covers.",
+                        "statement": "来自太阳的能量提供热量和光，这对地球的生命至关重要",
+                        "reason": "答案只提到了光，省略了热量的基本方面及其对生命的必要性，而基本事实涵盖了这些方面。",
                         },
                         {
-                            "statement": "The sun's light plays a critical role in Earth's climate system.",
-                            "reason": "This broader impact of the sun’s light on Earth's climate system is not addressed in the answer.",
+                        "statement": "太阳光在地球气候系统中起着至关重要的作用。",
+                        "reason": "答案中没有提到太阳光对地球气候系统的这种更广泛的影响。",
                         },
                         {
-                            "statement": "Sunlight helps to drive the weather and ocean currents.",
-                            "reason": "The effect of sunlight on weather patterns and ocean currents is omitted in the answer.",
+                        "statement": "阳光有助于推动天气和洋流。",
+                        "reason": "答案中省略了阳光对天气模式和洋流的影响。"
                         },
                     ],
                 }
             ).dict(),
         },
         {
-            "question": """What is the boiling point of water?""",
+            "question": "水的沸点是多少？",
             "answer": [
-                "The boiling point of water is 100 degrees Celsius at sea level"
+                "水在海平面的沸点是100摄氏度。"
             ],
             "ground_truth": [
-                "The boiling point of water is 100 degrees Celsius (212 degrees Fahrenheit) at sea level.",
-                "The boiling point of water can change with altitude.",
+                "水在海平面的沸点是100摄氏度（相当于212华氏度）。",
+                "水的沸点会随着海拔高度的变化而变化。"
             ],
             "classification": AnswerCorrectnessClassification.parse_obj(
                 {
-                    "TP": [
-                        {
-                            "statement": "The boiling point of water is 100 degrees Celsius at sea level",
-                            "reason": "This statement is directly supported by the ground truth which specifies the boiling point of water as 100 degrees Celsius at sea level.",
-                        }
-                    ],
-                    "FP": [],
-                    "FN": [
-                        {
-                            "statement": "The boiling point of water can change with altitude.",
-                            "reason": "This additional information about how the boiling point of water can vary with altitude is not mentioned in the answer.",
-                        }
-                    ],
+                  "TP": [
+                    {
+                      "statement": "水在海平面的沸点是100摄氏度。",
+                      "reason": "这一陈述直接由事实支持，事实指出了水在海平面的沸点为100摄氏度。"
+                    }
+                  ],
+                  "FP": [],
+                  "FN": [
+                    {
+                      "statement": "水的沸点会随着海拔高度的变化而变化。",
+                      "reason": "关于水的沸点随海拔高度变化的额外信息，在答案中没有提及。"
+                    }
+                  ]
                 }
             ).dict(),
         },
     ],
+
     input_keys=["question", "answer", "ground_truth"],
     output_key="classification",
     output_type="json",
