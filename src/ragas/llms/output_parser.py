@@ -18,25 +18,35 @@ TBaseModel = t.TypeVar("TBaseModel", bound=BaseModel)
 
 FIX_OUTPUT_FORMAT = Prompt(
     name="",
-    instruction="Below, the Completion did not satisfy the constraints given in the Prompt.",
+    instruction="在下面的内容中，完成的部分(completion)没有满足提示(prompt)中给出的约束条件。",
+    # instruction="Below, the  did not satisfy the constraints given in the Prompt.",
     output_format_instruction="",
     input_keys=["prompt", "completion"],
     output_key="fixed_completion",
 )
 
 
-JSON_FORMAT_INSTRUCTIONS = """The output should be a well-formatted JSON instance that conforms to the JSON schema below.
+# JSON_FORMAT_INSTRUCTIONS = """The output should be a well-formatted JSON instance that conforms to the JSON schema below.
+#
+# As an example, for the schema {{"properties": {{"foo": {{"title": "Foo", "description": "a list of strings", "type": "array", "items": {{"type": "string"}}}}}}, "required": ["foo"]}}
+# the object {{"foo": ["bar", "baz"]}} is a well-formatted instance of the schema. The object {{"properties": {{"foo": ["bar", "baz"]}}}} is not well-formatted.
+#
+# Here is the output JSON schema:
+# ```
+# {schema}
+# ```
+#
+# Do not return any preamble or explanations, return only a pure JSON string surrounded by triple backticks (```)."""
+JSON_FORMAT_INSTRUCTIONS = """输出应当是一个格式良好的JSON实例，符合下面的JSON模式。
 
-As an example, for the schema {{"properties": {{"foo": {{"title": "Foo", "description": "a list of strings", "type": "array", "items": {{"type": "string"}}}}}}, "required": ["foo"]}}
-the object {{"foo": ["bar", "baz"]}} is a well-formatted instance of the schema. The object {{"properties": {{"foo": ["bar", "baz"]}}}} is not well-formatted.
+举个例子，对于模式 {{"properties": {{"foo": {{"title": "Foo", "description": "一个字符串列表", "type": "array", "items": {{"type": "string"}}}}}}, "required": ["foo"]}}
+对象 {{"foo": ["bar", "baz"]}} 是该模式的一个格式良好的实例。对象 {{"properties": {{"foo": ["bar", "baz"]}}}} 并不符合格式要求。
 
-Here is the output JSON schema:
+这里是输出的JSON模式：
 ```
 {schema}
 ```
-
-Do not return any preamble or explanations, return only a pure JSON string surrounded by triple backticks (```)."""
-
+不要返回任何前言或解释，只返回一个纯JSON字符串，并且用三个反引号（```）包围起来。"""
 
 def get_json_format_instructions(pydantic_object: t.Type[TBaseModel]) -> str:
     # Copy schema to avoid altering original Pydantic schema.
