@@ -52,7 +52,7 @@ class Prompt(BaseModel):
     input_keys: t.List[str] = [""]
     output_key: str = ""
     output_type: t.Literal["json", "str"] = "json"
-    language: str = "english"
+    language: str = "chinese"
 
     @root_validator
     def validate_prompt(cls, values: t.Dict[str, t.Any]) -> t.Dict[str, t.Any]:
