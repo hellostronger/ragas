@@ -86,6 +86,7 @@ class BaseRagasLLM(ABC):
         is_async: bool = True,
     ) -> LLMResult:
         """Generate text using the given event loop."""
+        logger.info(f"底层打印prompt:{prompt}")
         if is_async:
             agenerate_text_with_retry = add_async_retry(
                 self.agenerate_text, self.run_config
