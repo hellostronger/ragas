@@ -50,28 +50,56 @@ LONG_FORM_ANSWER_PROMPT = Prompt(
     name="long_form_answer",
     output_format_instruction=_statements_output_instructions,
     instruction="Given a question, an answer, and sentences from the answer analyze the complexity of each sentence given under 'sentences' and break down each sentence into one or more fully understandable statements while also ensuring no pronouns are used in each statement. Format the outputs in JSON.",
+    # examples=[
+    #     {
+    #         "question": "Who was Albert Einstein and what is he best known for?",
+    #         "answer": "He was a German-born theoretical physicist, widely acknowledged to be one of the greatest and most influential physicists of all time. He was best known for developing the theory of relativity, he also made important contributions to the development of the theory of quantum mechanics.",
+    #         "sentences": """
+    #     0:He was a German-born theoretical physicist, widely acknowledged to be one of the greatest and most influential physicists of all time.
+    #     1:He was best known for developing the theory of relativity, he also made important contributions to the development of the theory of quantum mechanics.
+    #     """,
+    #         "analysis": StatementsAnswers.parse_obj(
+    #             [
+    #                 {
+    #                     "sentence_index": 0,
+    #                     "simpler_statements": [
+    #                         "Albert Einstein was a German-born theoretical physicist.",
+    #                         "Albert Einstein is recognized as one of the greatest and most influential physicists of all time.",
+    #                     ],
+    #                 },
+    #                 {
+    #                     "sentence_index": 1,
+    #                     "simpler_statements": [
+    #                         "Albert Einstein was best known for developing the theory of relativity.",
+    #                         "Albert Einstein also made important contributions to the development of the theory of quantum mechanics.",
+    #                     ],
+    #                 },
+    #             ]
+    #         ).dicts(),
+    #     }
+    # ],
     examples=[
         {
-            "question": "Who was Albert Einstein and what is he best known for?",
-            "answer": "He was a German-born theoretical physicist, widely acknowledged to be one of the greatest and most influential physicists of all time. He was best known for developing the theory of relativity, he also made important contributions to the development of the theory of quantum mechanics.",
+            "question": "阿尔伯特·爱因斯坦是谁？他最出名的贡献是什么？",
+            "answer": "他是一位出生于德国的理论物理学家，被广泛认为是有史以来最伟大、最有影响力的物理学家之一。他最著名的成就是发展了相对论，同时也对量子力学理论的发展做出了重要贡献。",
             "sentences": """
-        0:He was a German-born theoretical physicist, widely acknowledged to be one of the greatest and most influential physicists of all time. 
-        1:He was best known for developing the theory of relativity, he also made important contributions to the development of the theory of quantum mechanics.
-        """,
+            0:他是一位出生于德国的理论物理学家，被广泛认为是有史以来最伟大、最有影响力的物理学家之一。
+            1:他最著名的成就是发展了相对论，同时也对量子力学理论的发展做出了重要贡献。
+            """,
             "analysis": StatementsAnswers.parse_obj(
                 [
                     {
                         "sentence_index": 0,
                         "simpler_statements": [
-                            "Albert Einstein was a German-born theoretical physicist.",
-                            "Albert Einstein is recognized as one of the greatest and most influential physicists of all time.",
+                            "阿尔伯特·爱因斯坦是一位出生于德国的理论物理学家。",
+                            "阿尔伯特·爱因斯坦被公认为是有史以来最伟大、最有影响力的物理学家之一。",
                         ],
                     },
                     {
                         "sentence_index": 1,
                         "simpler_statements": [
-                            "Albert Einstein was best known for developing the theory of relativity.",
-                            "Albert Einstein also made important contributions to the development of the theory of quantum mechanics.",
+                            "阿尔伯特·爱因斯坦最著名的成就是发展了相对论。",
+                            "阿尔伯特·爱因斯坦也对量子力学理论的发展做出了重要贡献。",
                         ],
                     },
                 ]
