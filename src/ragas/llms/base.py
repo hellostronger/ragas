@@ -91,13 +91,15 @@ class BaseRagasLLM(ABC):
             agenerate_text_with_retry = add_async_retry(
                 self.agenerate_text, self.run_config
             )
-            return await agenerate_text_with_retry(
+            gen_result = await agenerate_text_with_retry(
                 prompt=prompt,
                 n=n,
                 temperature=temperature,
                 stop=stop,
                 callbacks=callbacks,
             )
+            logger.info(f"生成的结果为：{gen_result}")
+            return gen_result
         else:
             loop = asyncio.get_event_loop()
             generate_text_with_retry = add_retry(self.generate_text, self.run_config)
@@ -109,6 +111,7 @@ class BaseRagasLLM(ABC):
                 stop=stop,
                 callbacks=callbacks,
             )
+            logger.info(f"生成的结果为：{generate_text}")
             return await loop.run_in_executor(None, generate_text)
 
 
