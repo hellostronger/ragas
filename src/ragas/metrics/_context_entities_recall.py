@@ -226,6 +226,7 @@ class ContextEntityRecall(MetricWithLLM):
             is_async=is_async,
         )
 
+        logger.info(f"实体召回的结果为：{result}")
         result_text = result.generations[0][0].text
         answer = await _output_parser.aparse(
             result_text, p_value, self.llm, self.max_retries
